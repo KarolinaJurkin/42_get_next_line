@@ -6,7 +6,7 @@
 /*   By: kjurkin <kjurkin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:41:22 by kjurkin           #+#    #+#             */
-/*   Updated: 2025/03/22 16:21:49 by kjurkin          ###   ########.fr       */
+/*   Updated: 2025/03/26 19:11:04 by kjurkin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 2
 
 
 static int	ft_strlenconst(const char *str)
@@ -107,24 +107,32 @@ char	*get_next_line(int fd)
 	char	*buffer;
 	static char	*final;
 	
-	buffer = malloc(BUFFER_SIZE); //?jesli buffer size < od linijki to musze jakos zmalokowac wystarczajaco miejsca na cala linijke
+	buffer = malloc(BUFFER_SIZE);
 	a = read(fd, buffer, BUFFER_SIZE - 1);
+	// printf("final %s\n", final);
 	if (final)
 	{
 		// printf("final: %s\n", final);
 		buffer = ft_strjoin(final, buffer);
 	}
+	while (a > 0 && (!ft_strchr(buffer, '\n')))
+	{
+		final = buffer;
+		final = ft_strdup(final);
+		a = read(fd, buffer, BUFFER_SIZE - 1);
+		if (ft_strchr(buffer, '\0'))
+		{
+			buffer[BUFFER_SIZE - 1] = '\0';
+			buffer = ft_strjoin(final, buffer);
+			break;
+		}
+			buffer[BUFFER_SIZE - 1] = '\0';
+			buffer = ft_strjoin(final, buffer);
+	}
+	// printf("buffer: %s\n", buffer);
 	if (ft_strchr(buffer, '\n'))
 		final = ft_strchr(buffer, '\n') + 1;
 	final = ft_strdup(final);
-	while (a > 0 && !ft_strchr(buffer, '\n' && !ft_strchr(buffer, '\0')))
-	{
-		final = buffer;
-		// printf("%s\n", buffer);
-		a = read(fd, buffer, BUFFER_SIZE - 1);
-		buffer = ft_strjoin(final, buffer);
-	}
-	buffer = ft_strjoin(final, buffer); //????
 	buffer[count(buffer)] = '\0';
 	printf("%s", buffer);
 	return (buffer);
@@ -136,7 +144,7 @@ int	main(int argc, char *argv[])
 
 	fd = open(argv[1], O_RDONLY);
 	get_next_line(fd);
-	get_next_line(fd);
+	// get_next_line(fd);
 	close(fd);
 	return (argc);
 }
