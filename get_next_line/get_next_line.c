@@ -6,7 +6,7 @@
 /*   By: kjurkin <kjurkin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:41:22 by kjurkin           #+#    #+#             */
-/*   Updated: 2025/03/26 19:11:04 by kjurkin          ###   ########.fr       */
+/*   Updated: 2025/03/28 18:23:20 by kjurkin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#define BUFFER_SIZE 2
-
+#define BUFFER_SIZE 4
 
 static int	ft_strlenconst(const char *str)
 {
@@ -103,33 +102,22 @@ int	count(char *buffer)
 
 char	*get_next_line(int fd)
 {
-	ssize_t	a;
-	char	*buffer;
+	ssize_t		a;
+	char		*buffer;
 	static char	*final;
-	
+
 	buffer = malloc(BUFFER_SIZE);
 	a = read(fd, buffer, BUFFER_SIZE - 1);
-	// printf("final %s\n", final);
 	if (final)
-	{
-		// printf("final: %s\n", final);
 		buffer = ft_strjoin(final, buffer);
-	}
-	while (a > 0 && (!ft_strchr(buffer, '\n')))
+	while (a == BUFFER_SIZE - 1 && !ft_strchr(buffer, '\n'))
 	{
 		final = buffer;
 		final = ft_strdup(final);
 		a = read(fd, buffer, BUFFER_SIZE - 1);
-		if (ft_strchr(buffer, '\0'))
-		{
-			buffer[BUFFER_SIZE - 1] = '\0';
-			buffer = ft_strjoin(final, buffer);
-			break;
-		}
-			buffer[BUFFER_SIZE - 1] = '\0';
-			buffer = ft_strjoin(final, buffer);
+		buffer[a] = '\0';
+		buffer = ft_strjoin(final, buffer);
 	}
-	// printf("buffer: %s\n", buffer);
 	if (ft_strchr(buffer, '\n'))
 		final = ft_strchr(buffer, '\n') + 1;
 	final = ft_strdup(final);
@@ -138,16 +126,13 @@ char	*get_next_line(int fd)
 	return (buffer);
 }
 
-int	main(int argc, char *argv[])
-{
-	int	fd;
+// int	main(int argc, char *argv[])
+// {
+// 	int	fd;
 
-	fd = open(argv[1], O_RDONLY);
-	get_next_line(fd);
-	// get_next_line(fd);
-	close(fd);
-	return (argc);
-}
-
-// ssize_t read(int fd, void buffer[.count], size_t count)
-// if (count > buffer_size) {count = buffer_size} - to prevent overflow
+// 	fd = open(argv[1], O_RDONLY);
+// 	get_next_line(fd);
+// 	get_next_line(fd);
+// 	close(fd);
+// 	return (argc);
+// }
