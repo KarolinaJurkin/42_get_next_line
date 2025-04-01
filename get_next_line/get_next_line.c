@@ -6,7 +6,7 @@
 /*   By: kjurkin <kjurkin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/06 16:41:22 by kjurkin           #+#    #+#             */
-/*   Updated: 2025/03/28 18:23:20 by kjurkin          ###   ########.fr       */
+/*   Updated: 2025/04/01 18:01:24 by kjurkin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#define BUFFER_SIZE 4
+#include "get_next_line.h"
+#ifndef BUFFER_SIZE
+# define BUFFER_SIZE 4
+#endif
 
 static int	ft_strlenconst(const char *str)
 {
@@ -54,41 +57,41 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (ptr);
 }
 
-char	*ft_strdup(const char *s)
-{
-	char	*ptr;
-	size_t	i;
-	size_t	j;
+// char	*ft_strdup(const char *s)
+// {
+// 	char	*ptr;
+// 	size_t	i;
+// 	size_t	j;
 
-	i = 0;
-	j = 0;
-	while (s[i] != '\0')
-		i++;
-	ptr = malloc(i + 1);
-	if (ptr == NULL)
-		return (NULL);
-	while (j < i)
-	{
-		ptr[j] = s[j];
-		j++;
-	}
-	ptr[j] = '\0';
-	return (ptr);
-}
+// 	i = 0;
+// 	j = 0;
+// 	while (s[i] != '\0')
+// 		i++;
+// 	ptr = malloc(i + 1);
+// 	if (ptr == NULL)
+// 		return (NULL);
+// 	while (j < i)
+// 	{
+// 		ptr[j] = s[j];
+// 		j++;
+// 	}
+// 	ptr[j] = '\0';
+// 	return (ptr);
+// }
 
-char	*ft_strchr(char *s, int c)
-{
-	int		i;
+// char	*ft_strchr(char *s, int c)
+// {
+// 	int		i;
 
-	i = 0;
-	while (s[i] != c % 256 && s[i] != '\0')
-	{
-		i++;
-	}
-	if (s[i] == '\0' && c != '\0')
-		return (NULL);
-	return ((char *)(&s[i]));
-}
+// 	i = 0;
+// 	while (s[i] != c % 256 && s[i] != '\0')
+// 	{
+// 		i++;
+// 	}
+// 	if (s[i] == '\0' && c != '\0')
+// 		return (NULL);
+// 	return ((char *)(&s[i]));
+// }
 
 int	count(char *buffer)
 {
@@ -108,6 +111,12 @@ char	*get_next_line(int fd)
 
 	buffer = malloc(BUFFER_SIZE);
 	a = read(fd, buffer, BUFFER_SIZE - 1);
+	if (a <= 0 || fd < 0 || BUFFER_SIZE <= 0 || fd > 256)
+	{
+		free(buffer);
+		free(final);
+		return (NULL);
+	}
 	if (final)
 		buffer = ft_strjoin(final, buffer);
 	while (a == BUFFER_SIZE - 1 && !ft_strchr(buffer, '\n'))
@@ -126,13 +135,14 @@ char	*get_next_line(int fd)
 	return (buffer);
 }
 
-// int	main(int argc, char *argv[])
-// {
-// 	int	fd;
+int	main(int argc, char *argv[])
+{
+	int	fd;
 
-// 	fd = open(argv[1], O_RDONLY);
-// 	get_next_line(fd);
-// 	get_next_line(fd);
-// 	close(fd);
-// 	return (argc);
-// }
+	fd = open(argv[1], O_RDONLY);
+	get_next_line(fd);
+	get_next_line(fd);
+	get_next_line(fd);
+	close(fd);
+	return (argc);
+}
